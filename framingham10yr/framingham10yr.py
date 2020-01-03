@@ -457,16 +457,21 @@ def framingham_10year_risk(sex, age, total_cholesterol, hdl_cholesterol,
         response['errors']=errors
     else:
         response['points']=points
-        
-        
-        
-        
-        
-        
-        
-        
         response['percent_risk']= percent_risk
-    
+        without_perc = percent_risk.replace('%', '')
+        if '>' in without_perc:
+            modifier = 'gt'
+            without_perc = without_perc.replace('>', '')
+        elif '<' in without_perc:
+            modifier = 'lt'
+            without_perc = without_perc.replace('<', '')
+        else:
+            modifier = 'eq'
+
+        num_risk = int(without_perc)
+        response['num_risk'] = num_risk
+        response['modifier'] = modifier
+
     return response
 
 
@@ -485,9 +490,9 @@ if __name__ == "__main__":
         blood_pressure_med_treatment=sys.argv[7].lower()
         
     except(IndexError):
-        print "All values are required."
-        print "Usage: framingham.py <sex> <age> <total_cholesterol> <hdl_cholesterol systolic_blood_pressure> <smoker> <blood_pressure_med_treatment>"
-        print "Example: framingham.py male 25 152 56 130 0 0"
+        print ("All values are required.")
+        print ("Usage: framingham.py <sex> <age> <total_cholesterol> <hdl_cholesterol systolic_blood_pressure> <smoker> <blood_pressure_med_treatment>")
+        print ("Example: framingham.py male 25 152 56 130 0 0")
         exit(1)
         
     try:
@@ -498,9 +503,9 @@ if __name__ == "__main__":
                                        smoker, blood_pressure_med_treatment)
         
         #return pretty-print json to standard out
-        print json.dumps(result, indent=4)
+        print (json.dumps(result, indent=4))
           
     except():
-        print "An unexpected error occured. Here is the post-mortem:"
-        print sys.exc_info()
+        print( "An unexpected error occured. Here is the post-mortem:")
+        print( sys.exc_info())
         
